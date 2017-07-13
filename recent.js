@@ -1,10 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   let root = document.getElementById("root");
-  let test = document.createElement("div");
-  test.innerHTML = "I AM TEST";
-  root.appendChild(test);
-  let posts = getPosts('kijafa').then(posts => console.log(posts));
-  let comments = getComments('kijafa').then(comments => console.log(comments));
+  fetchPosts('kijafa').then(data => assembleList(data["data"]["children"]));
+  fetchComments('kijafa').then(data => assembleList(data["data"]["children"]));
 });
 
 
@@ -33,3 +30,28 @@ const getPosts = username => {
 const getComments = username => {
   return fetchPosts(username).then(data => data["data"]["children"]);
 };
+
+// Displaying API reponse
+
+function convertToHTML(list) {
+  let ul = document.createElement('ul');
+  list.forEach(item => {
+    let li = document.createElement('li');
+    if (item.kind === 't3') {
+      // t3 are posts
+      li.innerHTML = item.data.title;
+    } else if (item.kind === 't1') {
+      // t1 are comments
+      // console.log(item);
+      li.innerHTML = item.data.body;
+    }
+    ul.appendChild(li);
+  });
+
+  return ul;
+}
+
+function assembleList(list) {
+  let root = document.getElementById('root');
+  root.appendChild(convertToHTML(list));
+}
